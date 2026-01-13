@@ -1,0 +1,6 @@
+.DS_Store
+.metals/
+.vscode/
+target/
+project/project/
+project/target/

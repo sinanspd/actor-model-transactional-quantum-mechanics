@@ -1,0 +1,20 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Show your own actors at DEBUG -->
+  <logger name="Emitter$" level="DEBUG"/>
+  <logger name="Receiver$" level="DEBUG"/>
+  <logger name="Spacetime$" level="DEBUG"/>
+  <logger name="Simulation$" level="DEBUG"/>
+
+  <!-- Keep Pekko internals less noisy -->
+  <logger name="org.apache.pekko" level="INFO"/>
+
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT"/>
+  </root>
+</configuration>
