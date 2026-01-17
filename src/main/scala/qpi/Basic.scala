@@ -1,26 +1,11 @@
+package com.sinanspd.qpi
+
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 
 import scala.concurrent.duration.*
 import scala.util.Random
 import scala.concurrent.Await
-
-final case class Complex(re: Double, im: Double) {
-  def +(o: Complex): Complex = Complex(re + o.re, im + o.im)
-  def *(o: Complex): Complex = Complex(re * o.re - im * o.im, re * o.im + im * o.re)
-  def *(k: Double): Complex  = Complex(re * k, im * k)
-  def conj: Complex          = Complex(re, -im)
-  def abs2: Double           = re * re + im * im
-  override def toString: String = f"$re%.4f${if (im < 0) "" else "+"}${im}%.4fi"
-}
-
-final case class Vec2(x: Double, y: Double) {
-  def dist(o: Vec2): Double = math.hypot(x - o.x, y - o.y)
-}
-
-enum Side { case Left, Right }
-enum Outcome(val value: Int) { case Plus extends Outcome(+1); case Minus extends Outcome(-1) }
-enum CoherenceMode { case Coherent, Incoherent }
 
 object Spacetime {
   sealed trait Command
@@ -397,7 +382,7 @@ object Simulation {
     }
 }
 
-object TransactionalTIDemo {
+object TransactionalBasic{
   def main(args: Array[String]): Unit = {
     val shots = args.headOption.flatMap(_.toIntOption).getOrElse(5)
     val system: ActorSystem[Simulation.Command] = ActorSystem(Simulation(shots), "ti-demo")
