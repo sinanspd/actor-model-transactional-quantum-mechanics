@@ -152,9 +152,7 @@ object Receiver {
     }
 }
 
-// -------------------------
 // Bell detectors (absorbers) for joint transaction commits
-// -------------------------
 object BellDetector {
   sealed trait Command
   final case class Arm(emissionId: Long, theta: Double, manager: ActorRef[TransactionManager.Command]) extends Command
@@ -180,15 +178,9 @@ object BellDetector {
     }
 }
 
-// -------------------------
-// TransactionManager
-// - Single: choose one receiver with probability proportional to |response|^2
-// - Bell: choose a joint pair (left outcome, right outcome) using singlet correlations
-// -------------------------
 object TransactionManager {
   sealed trait Command
 
-  // ---- Single transaction protocol ----
   final case class BeginSingle(
     emissionId: Long,
     receivers: Vector[ActorRef[Receiver.Command]],
@@ -199,7 +191,7 @@ object TransactionManager {
   final case class SingleConfirmation(emissionId: Long, from: ActorRef[Receiver.Command], responseAmp: Complex) extends Command
   private final case class SingleTimeout(emissionId: Long) extends Command
 
-  // ---- Bell / joint protocol ----
+  //  joint protocol
   final case class BeginBell(
     emissionId: Long,
     thetaL: Double,
@@ -315,7 +307,6 @@ object TransactionManager {
         }
 
         Behaviors.receiveMessage {
-          // ---- single ----
           case BeginSingle(emissionId, receivers, replyTo, timeout) =>
             single += emissionId -> SingleState(receivers, replyTo, Map.empty)
             timers.startSingleTimer(SingleTimeout(emissionId), timeout)
@@ -335,7 +326,6 @@ object TransactionManager {
             decideSingle(emissionId)
             Behaviors.same
 
-          // ---- bell ----
           case BeginBell(emissionId, thetaL, thetaR, left, right, replyTo, timeout) =>
             bell += emissionId -> BellState(thetaL, thetaR, left, right, replyTo, Map.empty, Map.empty)
             timers.startSingleTimer(BellTimeout(emissionId), timeout)
@@ -743,7 +733,6 @@ object SimulationController {
         arr(idx(a, b)) += 1
         counts = counts.updated(key, arr)
 
-        // advance
         shotIdx += 1
         emissionId += 1
 
@@ -765,7 +754,6 @@ object SimulationController {
 
       case BellNoTransaction(eid) =>
         ctx.log.warn(s"[bell] emission=$eid no transaction")
-        // still advance the attempt counter
         shotIdx += 1
         emissionId += 1
 
